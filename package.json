@@ -1,0 +1,13 @@
+{
+  "name": "plugin-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Ross-Hunter <ross-hunter@ross-hunter.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.3.0",
+    "axios": "^1.4.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}

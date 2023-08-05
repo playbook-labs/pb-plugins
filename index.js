@@ -72,6 +72,8 @@ functions.http('removeBgHTTP', async (req, res) => {
     })
   }
 
+  console.log('success')
+
   // Return 200 so Playbook does not retry
   res.status(200).send()
 })

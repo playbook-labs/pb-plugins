@@ -1,9 +1,9 @@
 const functions = require('@google-cloud/functions-framework')
 
-const removeBgGroup = require('./functions/remove_bg_group')
-const removeBgNewGroup = require('./functions/remove_bg_new_group')
+const removeBgSingleAssetGroup = require('./functions/remove_bg_single_asset_group')
+const removeBgMultiAssetNewGroup = require('./functions/remove_bg_multi_asset_new_group')
 
 require('dotenv').config()
 
-functions.http('removeBgGroup', removeBgGroup)
-functions.http('removeBgNewGroup', removeBgNewGroup)
+functions.http('removeBgSingleAssetGroup', removeBgSingleAssetGroup)
+functions.http('removeBgMultiAssetNewGroup', removeBgMultiAssetNewGroup)

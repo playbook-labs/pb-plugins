@@ -4,6 +4,9 @@
   "main": "index.js",
   "author": "Ross-Hunter <ross-hunter@ross-hunter.com>",
   "license": "MIT",
+  "engines": {
+    "node": "^20.4.0"
+  },
   "dependencies": {
     "@google-cloud/functions-framework": "^3.3.0",
     "axios": "^1.4.0",

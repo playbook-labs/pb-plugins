@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
       createAssetsCall,
     ])
 
-    console.log('created our asset and got remove.bg response')
+    console.log("created our asset and got remove.bg response")
 
     const uploadUrl = createAssetsResponse.data.assets[0].uploadUrl
 
@@ -56,9 +56,9 @@ module.exports = async (req, res) => {
       data: removeBgResponse.data,
     })
 
-    console.log('uploaded to Playbook')
+    console.log("uploaded to Playbook")
   } catch (error) {
-    status = "failure"
+    status = "failed"
     console.log(error)
   }
 
@@ -73,7 +73,8 @@ module.exports = async (req, res) => {
     },
   })
 
-  console.log("success")
+  console.log("finished")
 
+  // Tell playbook you received the invocation! Don't leave use hanging!
   res.status(200).send()
 }

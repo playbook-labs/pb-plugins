@@ -2,7 +2,6 @@ const axios = require("axios")
 
 module.exports = async (req, res) => {
   const { pluginInvocationToken, assets, callbackUrl } = req.body
-
   console.log("Invoking removeBg plugin", pluginInvocationToken)
 
   let status = "success"
@@ -59,7 +58,7 @@ module.exports = async (req, res) => {
     await Promise.all(promises)
   } catch (error) {
     console.log(error)
-    status = "failure"
+    status = "failed"
   }
 
   console.log("status: ", status)
@@ -73,6 +72,8 @@ module.exports = async (req, res) => {
     },
   })
 
-  // Return 200 so Playbook does not retry
+  console.log('finished')
+
+  // Tell playbook you received the invocation! Don't leave use hanging!
   res.status(200).send()
 }

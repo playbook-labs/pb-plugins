@@ -1,30 +1,36 @@
-# Running locally
+# Playbook Plugins
 
-`npx @google-cloud/functions-framework --target=removeBgHTTP --port 8085`
+### What is Playbook?
 
-This will run the cloud function locally at the given port. Use this as your plugin_invocation_url. If running in dip you need to use `http://host.docker.internal:8085/`
+[Playbook](https://www.playbook.com) is the coolest way to organize, share, and collaborate on creative files and projects with your clients and team.
 
-Use ngrok to allow tunneling to your local machine.
+### What is a Playbook Plugin?
 
-# Deploying
+A plugin is a little bit of functionality that allows a third party developer to add extra functionality to the Playbook platform. Playbook has a beta plugin system that relies on webhooks. A plugin defines an `invocation_url` that can accept API calls from playbook that allow a developer to download Playbook assets, synthesize new assets, then upload those new assets directly into the Playbook platform.
 
-```
-gcloud functions deploy remove-bg-http-dev \
-  --gen2 \
-  --runtime=nodejs20 \
-  --region=us-west1 \
-  --source=. \
-  --entry-point=removeBgNewGroup \
-  --trigger-http \
-  --allow-unauthenticated \
-  --timeout=600
-```
+### That sounds sick, I want to build a plugin!
 
-# API
+[Contact us](mailto:) to get involved in our beta developer program.
+
+Let's start with a small amount of Playbook vocabulary:
+
+- Asset: Basically a file plus its metadata.
+- Group: A small collection of associated assets. Might be variations or different formats.
+- Board: A larger group of assets. Might be all photos from a photoshoot, or all the illustrations to use for a marketing campaign.
+- Playbook: A collection of boards and users with permissions to those boards. Could be a team, an organization or just a personal workspace.
+- User: Nothing tricky here.
+
+Now some specific plugin terms:
+
+- Plugin: We already defined this above, pay attention.
+- Plugin Invocation: When a user selects an asset and invokes the plugin, we create a record of this transaction. We'll use this token as an identifier so that Playbook and the plugin are on the same page.
+- Callback Url: This is the url on Playbook that a plugin will make API calls to.
+
+### What does it look like though?
+
+A user can browse our directory and install a plugin to their playbook. Then any user in that Playbook can select 1 or more assets and invoke the plugin through the UI. Playbook will then call your invocation_url with data about the assets the user wants your plugin to act on. That API call looks like this:
 
 ### Invoke Plugin
-
-A user selects 1 or more assets and invokes the plugin. Playbook will then call your invocation_url with data about the assets the user wants your plugin to act on.
 
 Playbook → Dev
 
@@ -39,11 +45,14 @@ Playbook → Dev
       "token": "XNyx47LXJF4atgi9AYu3ceAy",
       "url": "https://storage.googleapis.com/...",
       "title": "Fancy Picture of a Cat",
-      "type": ".png",
+      "type": ".jpeg",
     }
   ]
 }
 ```
+
+Great, now the plugin can download the file using the signed url and use that file for... well pretty much whatever you can think of. Our example plugin removes the background of images by calling out to [Remove.bg](https://www.remove.bg) and uploading the result to Playbook. In order to upload, a plugin first must request the creation of a new asset. We need a title for the new asset, and we (probably) want it grouped with source asset, so we pass that token back in the `group` field.
+
 
 ### Plugin requests creation of placeholder assets
 
@@ -56,7 +65,7 @@ Dev → Playbook
 	"assets": [
     {
       "group": "XNyx47LXJF4atgi9AYu3ceAy", -- group with input asset
-      "title": "Fancy Picture of a Cat -- modified",
+      "title": "Fancy Picture of a Cat -- no background",
     }
   ]
 }
@@ -78,13 +87,39 @@ Response from Playbook → Dev
 }
 ```
 
-### Plugin downloads the input asset, modifies the asset and uploads to new placeholder asset
+Awesome, so we have a signed upload url that we can upload our new asset to. We'll *do our special plugin work* and then upload that result to this url. Now we want the user to know that their new asset is ready, so we finalize by setting the status of the plugin invocation
 
-Finalize by setting status Dev → Playbook
+Dev → Playbook
 
 ```json
 {
   "pluginInvocationToken": "PAMwF9P8hxrCGvJJbUPU4zuj",
   "status": "success"
 }
+```
+
+## Example plugins
+
+You're on the repo right now. Our examples are all using Google Cloud Platform, but can be adapted to AWS lambda or self-hosted.
+
+## Running locally
+
+`npx @google-cloud/functions-framework --target=removeBgHTTP --port 8085`
+
+This will run the cloud function locally at the given port. Use this as your plugin_invocation_url. If running in dip you need to use `http://host.docker.internal:8085/`
+
+Use ngrok to allow tunneling to your local machine.
+
+## Deploying
+
+```
+gcloud functions deploy remove-bg-http-dev \
+  --gen2 \
+  --runtime=nodejs20 \
+  --region=us-west1 \
+  --source=. \
+  --entry-point=removeBgNewGroup \
+  --trigger-http \
+  --allow-unauthenticated \
+  --timeout=600
 ```

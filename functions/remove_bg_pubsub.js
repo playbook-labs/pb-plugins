@@ -1,36 +1,25 @@
 const axios = require("axios")
 
-// This is the function that will be called by Playbook when your plugin is invoked
-module.exports = async (req, res) => {
-  // These are the parameters that Playbook will send to your plugin
-  // you'll create a new request to `callbackUrl` and pass back `pluginInvocationToken`
-  // `assets` is an array of assets that your plugin will operate on
-  const { pluginInvocationToken, assets, callbackUrl } = req.body
+module.exports = async (cloudEvent) => {
+  // The Pub/Sub message is passed as the CloudEvent's data payload.
+  const body = JSON.parse(Buffer.from(cloudEvent.data.message.data, 'base64').toString())
+
+  const { pluginInvocationToken, assets, callbackUrl } = body
+
   console.log("Invoking removeBg plugin", pluginInvocationToken)
 
-  // Don't store API keys in your source code! Use environment variables
-  const removeBGAPIKey = process.env.REMOVE_BG_API_KEY
-
-  // We'll use this status to tell Playbook if the plugin succeeded or failed
   let status = "success"
 
   // assets is always an array, but if you limit your plugin to a single asset
   // then you can avoid loops by grabbing the first (and only) input asset
   const asset = assets[0]
-
-  // These are the fields we are interested in on the asset
   const { url, title, token } = asset
 
-  // Errors happen, so we'll wrap our code in a try/catch block
   try {
-    // We'll use axios to make our API calls
-    // We'll make two calls in parallel, so we'll use Promise.all to wait for both to finish
-
-    // https://www.remove.bg/api#remove-background
     const removeBgCall = axios({
       method: "post",
       url: "https://api.remove.bg/v1.0/removebg",
-      headers: { "X-Api-Key": removeBGAPIKey },
+      headers: { "X-Api-Key": process.env.REMOVE_BG_API_KEY },
       responseType: "arraybuffer",
       data: {
         image_url: url,
@@ -39,7 +28,6 @@ module.exports = async (req, res) => {
       },
     })
 
-    // We'll need to create a placeholder asset we'll upload to
     const createAssetsCall = axios({
       method: "post",
       url: callbackUrl,
@@ -55,7 +43,7 @@ module.exports = async (req, res) => {
       },
     })
 
-    // We've defined both of our API calls above and we're ready to make them
+    // Resolve these both in parallel to be faster
     const [removeBgResponse, createAssetsResponse] = await Promise.all([
       removeBgCall,
       createAssetsCall,
@@ -63,7 +51,6 @@ module.exports = async (req, res) => {
 
     console.log("created our asset and got remove.bg response")
 
-    // We'll need to upload the image to the asset Playbook created for us
     const uploadUrl = createAssetsResponse.data.assets[0].uploadUrl
 
     await axios({
@@ -91,7 +78,4 @@ module.exports = async (req, res) => {
   })
 
   console.log("finished")
-
-  // Tell playbook you received the invocation! Don't leave use hanging!
-  res.status(200).send()
 }

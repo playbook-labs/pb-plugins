@@ -98,6 +98,21 @@ Dev → Playbook
 }
 ```
 
+## What does the plugin system not do?
+
+This plugin system should be considered Beta v1. We want to add more operations in the future, but for now we only support `createAssets`. Here are some things you might want to do, that you can't (yet)
+
+- No updating existing assets.
+- No parameters, plugins are invoked in a single button press.
+- No creating new boards.
+
+## I'm ready to write some code!
+
+We are going to show some examples using Google Cloud Functions and NodeJS, but since the plugin system is implemented via webhooks, you can use any technology you'd like that can respond to an HTTP request (within 10 seconds!). All processing is done asynchronously.
+
+You *can* do all your work within a single reb request, but you might timeout.
+
+
 ## Example plugins
 
 You're on the repo right now. Our examples are all using Google Cloud Platform, but can be adapted to AWS lambda or self-hosted.
@@ -112,14 +127,31 @@ Use ngrok to allow tunneling to your local machine.
 
 ## Deploying
 
+HTTP
+
 ```
 gcloud functions deploy remove-bg-http-dev \
   --gen2 \
   --runtime=nodejs20 \
   --region=us-west1 \
   --source=. \
-  --entry-point=removeBgNewGroup \
+  --entry-point=removeBgHttp \
   --trigger-http \
   --allow-unauthenticated \
-  --timeout=600
+  --timeout=540
+```
+
+PubSub
+
+`gcloud pubsub topics create REMOVE_BG_PUBSUB`
+
+```
+gcloud functions deploy remove-bg-pub-sub \
+  --trigger-topic=REMOVE_BG_PUBSUB \
+  --gen2 \
+  --runtime=nodejs20 \
+  --region=us-west1 \
+  --source=. \
+  --entry-point=removeBgPubSub \
+  --timeout=540
 ```

@@ -2,6 +2,7 @@
   "name": "plugin-example",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "author": "Ross-Hunter <ross-hunter@ross-hunter.com>",
   "license": "MIT",
   "engines": {

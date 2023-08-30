@@ -1,7 +1,7 @@
-const axios = require("axios")
+import axios from "axios"
 
 // This is the function that will be called by Playbook when your plugin is invoked
-module.exports = async (req, res) => {
+export default async (req, res) => {
   // These are the parameters that Playbook will send to your plugin
   // you'll create a new request to `callbackUrl` and pass back `pluginInvocationToken`
   // `assets` is an array of assets that your plugin will operate on

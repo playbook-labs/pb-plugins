@@ -1,6 +1,6 @@
-const axios = require("axios")
+import axios from "axios"
 
-module.exports = async (cloudEvent) => {
+export default async (cloudEvent) => {
   // The Pub/Sub message is passed as the CloudEvent's data payload.
   const body = JSON.parse(Buffer.from(cloudEvent.data.message.data, 'base64').toString())
 

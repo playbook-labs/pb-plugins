@@ -1,10 +1,10 @@
 // Imports the Google Cloud client library
-const {PubSub} = require('@google-cloud/pubsub')
+import { PubSub } from '@google-cloud/pubsub';
 
 // Creates a client; cache this for further use
 const pubSubClient = new PubSub()
 
-module.exports = async function publishMessage(topicNameOrId, data) {
+export default async function publishMessage(topicNameOrId, data) {
   // Publishes the message as a string, e.g. "Hello, world!" or JSON.stringify(someObject)
   const dataBuffer = Buffer.from(data);
 

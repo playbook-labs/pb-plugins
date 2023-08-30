@@ -1,12 +1,14 @@
-const functions = require('@google-cloud/functions-framework')
+import functions from '@google-cloud/functions-framework'
 
-const publishMessage = require('./functions/helpers/publish')
+import publishMessage from './functions/helpers/publish.js'
 
-const removeBgSingleAssetGroup = require('./functions/remove_bg_single_asset_group')
-const removeBgMultiAssetNewGroup = require('./functions/remove_bg_multi_asset_new_group')
-const removeBgPubSub = require('./functions/remove_bg_pubsub')
+import removeBgSingleAssetGroup from './functions/remove_bg_single_asset_group.js'
+import removeBgMultiAssetNewGroup from './functions/remove_bg_multi_asset_new_group.js'
+import removeBgPubSub from './functions/remove_bg_pubsub.js'
 
-require('dotenv').config()
+
+import dotenv from 'dotenv'
+dotenv.config()
 
 functions.http('removeBgSingleAssetGroup', removeBgSingleAssetGroup)
 functions.http('removeBgMultiAssetNewGroup', removeBgMultiAssetNewGroup)

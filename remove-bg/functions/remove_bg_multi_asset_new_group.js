@@ -1,6 +1,6 @@
-const axios = require("axios")
+import axios from "axios"
 
-module.exports = async (req, res) => {
+export default async (req, res) => {
   const { pluginInvocationToken, assets, callbackUrl } = req.body
   console.log("Invoking removeBg plugin", pluginInvocationToken)
 

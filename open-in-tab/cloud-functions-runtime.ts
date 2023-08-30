@@ -11,11 +11,11 @@ import plugin from './src/plugin';
 
 // This is the function that will be called by Playbook when the plugin is invoked.
 // All it does is enqueue a separate job to process the assets and returns 200 OK
-functions.http('split2x2InvocationHandler', async (req, res) => {
+functions.http('openInTabInvocationHandler', async (req, res) => {
   // We use pubsub to enqueue a job to process the assets
   const dataBuffer = Buffer.from(JSON.stringify(req.body));
   await new PubSub()
-    .topic('SPLIT_2x2_TOPIC')
+    .topic('OPEN_IN_TAB_TOPIC')
     .publishMessage({ data: dataBuffer });
 
   // Return quickly so we don't run into an HTTP timeout
@@ -23,7 +23,7 @@ functions.http('split2x2InvocationHandler', async (req, res) => {
 });
 
 // This function does the actual work of the plugin asynchronously
-functions.cloudEvent('split2x2ProcessAsync', async (cloudEvent: any) => {
+functions.cloudEvent('openInTabProcessAsync', async (cloudEvent: any) => {
   const body = JSON.parse(Buffer.from(cloudEvent.data.message.data, 'base64').toString());
 
   console.log('data', cloudEvent.data.message.data);
@@ -48,25 +48,25 @@ functions.cloudEvent('split2x2ProcessAsync', async (cloudEvent: any) => {
 // gcloud config set project EXAMPLE_PLUGIN_PROJECT
 
 // Create PubSub Topic
-// gcloud pubsub topics create SPLIT_2x2_TOPIC
+// gcloud pubsub topics create OPEN_IN_TAB_TOPIC
 
 // Deploy Invocation Handler
-// gcloud functions deploy split-2x2-invocation-handler \
+// gcloud functions deploy open-in-tab-invocation-handler \
 //   --gen2 \
 //   --runtime=nodejs20 \
 //   --region=us-west1 \
 //   --source=. \
-//   --entry-point=split2x2InvocationHandler \
+//   --entry-point=openInTabInvocationHandler \
 //   --trigger-http \
 //   --allow-unauthenticated \
 //   --timeout=540
 
 // Deploy Async Processing Function
-// gcloud functions deploy split-2x2-process-async \
-//   --trigger-topic=SPLIT_2x2_TOPIC \
+// gcloud functions deploy open-in-tab-process-async \
+//   --trigger-topic=OPEN_IN_TAB_TOPIC \
 //   --gen2 \
 //   --runtime=nodejs20 \
 //   --region=us-west1 \
 //   --source=. \
-//   --entry-point=split2x2ProcessAsync \
+//   --entry-point=openInTabProcessAsync \
 //   --timeout=540

@@ -1,6 +1,6 @@
-# Split 2x2 (Playbook Plugin)
+# Open in Tab (Playbook Plugin)
 
-An example plugin that splits a 2x2 gallery-style image into 4 separate images.
+An example plugin that opens a file in a new tab.
 
 ## Development
 

@@ -1,32 +1,8 @@
 import {
   PlaybookAPI,
-  downloadFileToBuffer,
-  uploadBufferToUrl
 } from "./lib";
-import sharp from "sharp";
 
-const outputs = [
-  {
-    name: "top left",
-    leftOffset: 0,
-    topOffset: 0,
-  },
-  {
-    name: "top right",
-    leftOffset: 0.5,
-    topOffset: 0,
-  },
-  {
-    name: "bottom left",
-    leftOffset: 0,
-    topOffset: 0.5,
-  },
-  {
-    name: "bottom right",
-    leftOffset: 0.5,
-    topOffset: 0.5,
-  },
-];
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default async function ({
   pluginInvocationToken,
@@ -41,44 +17,12 @@ export default async function ({
   });
 
   const inputAsset = assets[0];
-  const inputImageBuffer = await downloadFileToBuffer(inputAsset.url);
 
-  console.log("loaded input asset");
+  console.log("sleeping on", inputAsset.token)
 
-  const { width, height } = await sharp(inputImageBuffer).metadata();
-  console.log("size", width, height);
+  await sleep(10_000)
 
-  if (!width || !height || width < 2 || height < 2) {
-    console.log("failure", width, height);
-    playbookAPI.reportStatus("failure");
-    return;
-  }
-
-  const skeletonAssets = await playbookAPI.createSkeletonAssets(
-    outputs.map((output) => ({
-      title: `${inputAsset.title} - ${output.name}`,
-      group: inputAsset.token,
-    }))
-  );
-
-  console.log("created skeleton assets");
-
-  for (let i = 0; i < outputs.length; i++) {
-    const outputImageBuffer = await sharp(inputImageBuffer)
-      .extract({
-        left: outputs[i].leftOffset * width,
-        top: outputs[i].topOffset * height,
-        width: width / 2,
-        height: height / 2,
-      })
-      .toBuffer();
-
-    console.log(`processed image ${i+1} with sharp`);
-
-    await uploadBufferToUrl(outputImageBuffer, skeletonAssets[i].uploadUrl);
-
-    console.log(`uploaded image ${i+1}`);
-  }
+  console.log("awake");
 
   playbookAPI.reportStatus("success");
 

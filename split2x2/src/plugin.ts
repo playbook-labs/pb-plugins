@@ -1,67 +1,86 @@
-import axios from 'axios';
-import sharp from 'sharp';
+import {
+  PlaybookAPI,
+  downloadFileToBuffer,
+  uploadBufferToUrl
+} from "./lib";
+import sharp from "sharp";
 
-type PluginInvocationParams = {
-  pluginInvocationToken: string;
-  assets: any;
-  callbackUrl?: string;
-};
+const outputs = [
+  {
+    name: "top left",
+    leftOffset: 0,
+    topOffset: 0,
+  },
+  {
+    name: "top right",
+    leftOffset: 0.5,
+    topOffset: 0,
+  },
+  {
+    name: "bottom left",
+    leftOffset: 0,
+    topOffset: 0.5,
+  },
+  {
+    name: "bottom right",
+    leftOffset: 0.5,
+    topOffset: 0.5,
+  },
+];
 
-export default async function ({ pluginInvocationToken, assets, callbackUrl }: PluginInvocationParams) {
-  console.log('split2x2', pluginInvocationToken, JSON.stringify(assets), callbackUrl);
+export default async function ({
+  pluginInvocationToken,
+  callbackUrl,
+  assets,
+}: PluginInvocationParams) {
+  console.log("invoked plugin");
+
+  const playbookAPI = new PlaybookAPI({
+    pluginInvocationToken,
+    callbackUrl,
+  });
 
   const inputAsset = assets[0];
+  const inputImageBuffer = await downloadFileToBuffer(inputAsset.url);
 
-  // TODO: consider using https://github.com/sindresorhus/got, it has a simpler syntax:
-  // const imageBuffer = await got(url).buffer();
-  const inputImageBuffer = (
-    await axios({
-      url: inputAsset.url,
-      responseType: 'arraybuffer'
-    })
-  ).data;
+  console.log("loaded input asset");
 
-  console.log('loaded input asset');
+  const { width, height } = await sharp(inputImageBuffer).metadata();
+  console.log("size", width, height);
 
-  const outputImageBuffer = await sharp(inputImageBuffer).rotate(180).toBuffer();
+  if (!width || !height || width < 2 || height < 2) {
+    console.log("failure", width, height);
+    playbookAPI.reportStatus("failure");
+    return;
+  }
 
-  console.log('processed with sharp');
+  const skeletonAssets = await playbookAPI.createSkeletonAssets(
+    outputs.map((output) => ({
+      title: `${inputAsset.title} - ${output.name}`,
+      group: inputAsset.token,
+    }))
+  );
 
-  // Create a placeholder asset to upload the result to
-  const createdAssets = (await axios({
-    method: 'post',
-    url: callbackUrl,
-    data: {
-      pluginInvocationToken,
-      operation: 'createAssets',
-      assets: [
-        {
-          title: `${inputAsset.title} - flipped`,
-          group: inputAsset.token
-        }
-      ]
-    }
-  })).data.assets;
+  console.log("created skeleton assets");
 
-  console.log('created assets', JSON.stringify(createdAssets));
+  for (let i = 0; i < outputs.length; i++) {
+    const outputImageBuffer = await sharp(inputImageBuffer)
+      .extract({
+        left: outputs[i].leftOffset * width,
+        top: outputs[i].topOffset * height,
+        width: width / 2,
+        height: height / 2,
+      })
+      .toBuffer();
 
-  await axios({
-    method: 'put',
-    headers: { 'Content-Type': 'image/png' },
-    url: createdAssets[0].uploadUrl,
-    data: outputImageBuffer
-  });
+    console.log(`processed image ${i+1} with sharp`);
 
-  console.log('uploaded output asset');
+    await uploadBufferToUrl(outputImageBuffer, skeletonAssets[i].uploadUrl);
 
-  await axios({
-    method: 'post',
-    url: callbackUrl,
-    data: {
-      pluginInvocationToken,
-      status: 'success'
-    }
-  });
+    console.log(`uploaded image ${i+1}`);
+  }
 
-  console.log('done');
+  playbookAPI.reportStatus("success");
+
+  console.log("done");
 }

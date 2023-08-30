@@ -12,58 +12,66 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const axios_1 = __importDefault(require("axios"));
+const lib_1 = require("./lib");
 const sharp_1 = __importDefault(require("sharp"));
-const fs_1 = __importDefault(require("fs"));
-const uuid_1 = require("uuid");
-function default_1({ pluginInvocationToken, assets, callbackUrl, }) {
+const outputs = [
+    {
+        name: "top left",
+        leftOffset: 0,
+        topOffset: 0,
+    },
+    {
+        name: "top right",
+        leftOffset: 0.5,
+        topOffset: 0,
+    },
+    {
+        name: "bottom left",
+        leftOffset: 0,
+        topOffset: 0.5,
+    },
+    {
+        name: "bottom right",
+        leftOffset: 0.5,
+        topOffset: 0.5,
+    },
+];
+function default_1({ pluginInvocationToken, callbackUrl, assets, }) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("split2x2", pluginInvocationToken, JSON.stringify(assets), callbackUrl);
+        console.log("invoked plugin");
+        const playbookAPI = new lib_1.PlaybookAPI({
+            pluginInvocationToken,
+            callbackUrl,
+        });
         const inputAsset = assets[0];
-        // TODO: consider using https://github.com/sindresorhus/got, it has a simpler syntax:
-        // const imageBuffer = await got(url).buffer();
-        const inputImageBuffer = (yield (0, axios_1.default)({
-            url: inputAsset.url,
-            responseType: "arraybuffer",
-        })).data;
+        const inputImageBuffer = yield (0, lib_1.downloadFileToBuffer)(inputAsset.url);
         console.log("loaded input asset");
-        const outputFileName = "/tmp/" + (0, uuid_1.v4)();
-        yield (0, sharp_1.default)(inputImageBuffer)
-            .rotate(180)
-            .toFile(outputFileName); // .toBuffer has a memory leak on Google Cloud Functions
-        console.log("processed with sharp");
-        // Create a placeholder asset to upload the result to
-        const createdAssets = (yield (0, axios_1.default)({
-            method: "post",
-            url: callbackUrl,
-            data: {
-                pluginInvocationToken,
-                operation: "createAssets",
-                assets: [
-                    {
-                        title: `${inputAsset.title} - flipped`,
-                        group: inputAsset.token,
-                    },
-                ],
-            },
-        })).data.assets;
-        console.log("created assets", JSON.stringify(createdAssets));
-        const outputImageBuffer = fs_1.default.readFileSync(outputFileName);
-        yield (0, axios_1.default)({
-            method: "put",
-            headers: { "Content-Type": "image/png" },
-            url: createdAssets[0].uploadUrl,
-            data: outputImageBuffer,
-        });
-        console.log("uploaded output asset");
-        yield (0, axios_1.default)({
-            method: "post",
-            url: callbackUrl,
-            data: {
-                pluginInvocationToken,
-                status: "success",
-            },
-        });
+        const { width, height } = yield (0, sharp_1.default)(inputImageBuffer).metadata();
+        console.log("size", width, height);
+        if (!width || !height || width < 2 || height < 2) {
+            console.log("failure", width, height);
+            playbookAPI.reportStatus("failure");
+            return;
+        }
+        const skeletonAssets = yield playbookAPI.createSkeletonAssets(outputs.map((output) => ({
+            title: `${inputAsset.title} - ${output.name}`,
+            group: inputAsset.token,
+        })));
+        console.log("created skeleton assets");
+        for (let i = 0; i < outputs.length; i++) {
+            const outputImageBuffer = yield (0, sharp_1.default)(inputImageBuffer)
+                .extract({
+                left: outputs[i].leftOffset * width,
+                top: outputs[i].topOffset * height,
+                width: width / 2,
+                height: height / 2,
+            })
+                .toBuffer();
+            console.log(`processed image ${i + 1} with sharp`);
+            yield (0, lib_1.uploadBufferToUrl)(outputImageBuffer, skeletonAssets[i].uploadUrl);
+            console.log(`uploaded image ${i + 1}`);
+        }
+        playbookAPI.reportStatus("success");
         console.log("done");
     });
 }

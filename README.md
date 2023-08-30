@@ -8,6 +8,6 @@ For more information about Playbook and Plugins, go [here](https://playbookteam.
 
 | Example      | Description | Deployment |
 | ----------- | ----------- | ----------|
-| gif-creator     | A plugin that takes many assets and stitches them together in a GIF       | AWS |
-| remove-bg     | A plugin that takes an asset and removes its background by calling the removeBG API        | GCP|
+| [gif-creator](https://github.com/playbook-labs/pb-plugins/tree/main/gif-creator)     | A plugin that takes many assets and stitches them together in a GIF       | AWS |
+| [remove-bg](https://github.com/playbook-labs/pb-plugins/tree/main/remove-bg)     | A plugin that takes an asset and removes its background by calling the removeBG API        | GCP|
 

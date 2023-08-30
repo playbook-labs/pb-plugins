@@ -6,6 +6,8 @@ For more information about Playbook and Plugins, go [here](https://playbookteam.
 
 # Examples 
 
-## gif-creator 
-- a plugin that takes many assets and stitches them together in a GIF. Also includes AWS Deployment instructions
-## remove-bg 
+| Example      | Description | Deployment |
+| ----------- | ----------- | ----------|
+| gif-creator     | A plugin that takes many assets and stitches them together in a GIF       | AWS |
+| remove-bg     | A plugin that takes an asset and removes its background by calling the removeBG API        | GCP|
+

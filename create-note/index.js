@@ -1,11 +1,12 @@
-const functions = require("@google-cloud/functions-framework")
-const axios = require("axios")
-const Tesseract = require("tesseract.js")
-
-const publishMessage = require("./helpers/publish")
+import functions from "@google-cloud/functions-framework"
+import axios from "axios"
+import Tesseract from "tesseract.js"
+import { PubSub } from "@google-cloud/pubsub"
 
 functions.http("extractTextHttp", async (req, res) => {
-  await publishMessage("EXTRACT_TEXT_PUBSUB", JSON.stringify(req.body))
+  const data = Buffer.from(JSON.stringify(req.body))
+
+  await new PubSub().topic("EXTRACT_TEXT_PUBSUB").publishMessage({ data })
 
   res.status(200).send("OK")
 })

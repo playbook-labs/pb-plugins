@@ -18,26 +18,43 @@ When you create your Sandbox plugin from https://www.playbook.com/account, set y
 `ngrok` URL as the invocation URL. You can develop your plugin by triggering it from
 your Playbook workspace with any test files you've uploaded.
 
-## Releasing a public version
+## Deploying on Google Cloud
 
-There are two ways to release your plugin (making it available to everyone):
+Set up a google cloud account and set up billing
+Currently offering $300 free -> https://cloud.google.com/free/docs/gcp-free-tier
 
-### Run on Playbook infrastructure
+Install Google Cloud SDK
+https://cloud.google.com/sdk/docs/install or `brew install google-cloud-sdk`
 
-Submit your Github repository to the Playbook team. We'll audit your code, then deploy
-your plugin using our infrastructure. You'll still be listed as the plugin author,
-and the plugin will get a verified badge. Playbook will subtract the operational
-costs out of your proceeds.
+```bash
+# Login
+gcloud auth login
 
-To apply, email alex@playbook.com with a link to your Github repository.
+# Create and Set Project
+gcloud projects create EXAMPLE_PLUGIN_PROJECT
+gcloud config set project EXAMPLE_PLUGIN_PROJECT
 
-### Deploy on your own infrastructure
+# Create PubSub Topic
+gcloud pubsub topics create SPLIT_2x2_TOPIC
 
-You deploy your plugin in any way you like. Your plugin won't have a verified badge,
-but you'll remain in full control of your costs and infrastructure.
+# Deploy Invocation Handler
+gcloud functions deploy split-2x2-invocation-handler \
+  --gen2 \
+  --runtime=nodejs20 \
+  --region=us-west1 \
+  --source=. \
+  --entry-point=split2x2InvocationHandler \
+  --trigger-http \
+  --allow-unauthenticated \
+  --timeout=540
 
-Note that your plugin still must comply with the Playbook Developer Terms of Service.
-
-The Playbook team will still need to review your plugin to mark it as live. Email
-alex@playbook.com with a short description of what your plugin does, and the email
-on your Playbook Developer account.
+# Deploy Async Processing Function
+gcloud functions deploy split-2x2-process-async \
+  --trigger-topic=SPLIT_2x2_TOPIC \
+  --gen2 \
+  --runtime=nodejs20 \
+  --region=us-west1 \
+  --source=. \
+  --entry-point=split2x2ProcessAsync \
+  --timeout=540
+```

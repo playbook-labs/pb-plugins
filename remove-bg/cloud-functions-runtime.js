@@ -2,8 +2,6 @@
 // We need two functions:
 //   - Function A to handle the HTTP request, kick off Function B, and return immediately
 //   - Function B to do the actual work asynchronously
-//
-// Google Cloud Deployment instructions at the bottom of this file
 
 import * as functions from '@google-cloud/functions-framework';
 import { PubSub } from '@google-cloud/pubsub';

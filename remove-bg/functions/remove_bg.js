@@ -1,12 +1,9 @@
 import axios from "axios"
 
-export default async (cloudEvent) => {
-  // The Pub/Sub message is passed as the CloudEvent's data payload.
-  const body = JSON.parse(Buffer.from(cloudEvent.data.message.data, 'base64').toString())
-
-  const { pluginInvocationToken, assets, callbackUrl } = body
+export default async ( {pluginInvocationToken, assets, callbackUrl }) => {
 
   console.log("Invoking removeBg plugin", pluginInvocationToken)
+  
 
   let status = "success"
 

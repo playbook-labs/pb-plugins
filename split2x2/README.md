@@ -18,7 +18,7 @@ Edit `src/plugin.mjs` to change the behavior of the plugin.
 
 3. Install [ngrok](https://ngrok.com/docs/getting-started/) and run it to generate a public Forwarding URL for your local server:
 
-   ```ngrok http 3000 --subdomain=gif-creator-example```
+   ```ngrok http 3000 --subdomain=split2x2-example```
 
 4. On the Plugins tab at https://www.playbook.com/account, edit your Plugin Invocation URL to your ngrok Forwarding URL.
 

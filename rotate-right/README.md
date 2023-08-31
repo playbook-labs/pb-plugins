@@ -51,7 +51,7 @@ gcloud pubsub topics create ROTATE_RIGHT_TOPIC
    --runtime=nodejs20 \
    --region=us-west1 \
    --source=. \
-   --entry-point=removeBgInvocationHandler \
+   --entry-point=rotateRightInvocationHandler \
    --trigger-http \
    --allow-unauthenticated \
    --timeout=540
@@ -63,6 +63,6 @@ gcloud pubsub topics create ROTATE_RIGHT_TOPIC
    --runtime=nodejs20 \
    --region=us-west1 \
    --source=. \
-   --entry-point=removeBgAsync \
+   --entry-point=rotateRightProcessAsync \
    --timeout=540
 ```

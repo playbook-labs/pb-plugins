@@ -1,6 +1,6 @@
-# Split 2x2 (Playbook Plugin)
+# Open in Tab (Playbook Plugin)
 
-An example plugin that splits a 2x2 gallery-style image into 4 separate images.
+An example plugin that opens a file in a new tab.
 
 ## Development
 
@@ -35,26 +35,26 @@ gcloud projects create EXAMPLE_PLUGIN_PROJECT
 gcloud config set project EXAMPLE_PLUGIN_PROJECT
 
 # Create PubSub Topic
-gcloud pubsub topics create SPLIT_2x2_TOPIC
+gcloud pubsub topics create OPEN_IN_TAB_TOPIC
 
 # Deploy Invocation Handler
-gcloud functions deploy split-2x2-invocation-handler \
+gcloud functions deploy open-in-tab-invocation-handler \
   --gen2 \
   --runtime=nodejs20 \
   --region=us-west1 \
   --source=. \
-  --entry-point=split2x2InvocationHandler \
+  --entry-point=openInTabInvocationHandler \
   --trigger-http \
   --allow-unauthenticated \
   --timeout=540
 
 # Deploy Async Processing Function
-gcloud functions deploy split-2x2-process-async \
-  --trigger-topic=SPLIT_2x2_TOPIC \
+gcloud functions deploy open-in-tab-process-async \
+  --trigger-topic=OPEN_IN_TAB_TOPIC \
   --gen2 \
   --runtime=nodejs20 \
   --region=us-west1 \
   --source=. \
-  --entry-point=split2x2ProcessAsync \
+  --entry-point=openInTabProcessAsync \
   --timeout=540
 ```

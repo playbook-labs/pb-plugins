@@ -49,19 +49,19 @@ export default async function ({
   console.log("size", width, height);
 
   if (!width || !height || width < 2 || height < 2) {
-    console.log("failure", width, height);
-    playbookAPI.reportStatus("failure");
+    console.log("failed", width, height);
+    playbookAPI.reportStatus("failed");
     return;
   }
 
-  const skeletonAssets = await playbookAPI.createSkeletonAssets(
+  const skeletonAssets = await playbookAPI.createPlaceholderAssets(
     outputs.map((output) => ({
       title: `${inputAsset.title} - ${output.name}`,
       group: inputAsset.token,
     }))
   );
 
-  console.log("created skeleton assets");
+  console.log("created placeholder assets");
 
   for (let i = 0; i < outputs.length; i++) {
     const outputImageBuffer = await sharp(inputImageBuffer)

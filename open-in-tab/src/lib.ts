@@ -60,7 +60,7 @@ export class PlaybookAPI {
       url: this.callbackUrl,
       data: {
         pluginInvocationToken: this.pluginInvocationToken,
-        openUrl: url
+        openUrl: url,
       },
     });
   }

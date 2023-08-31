@@ -12,4 +12,6 @@ For more information about Playbook and Plugins, go [here](https://playbookteam.
 | [remove-bg](https://github.com/playbook-labs/pb-plugins/tree/main/remove-bg)     | A plugin that takes an asset and removes its background by calling an external API        | GCP|
 | [rotate-right](https://github.com/playbook-labs/pb-plugins/tree/main/split2x2) | A plugin that takes an asset and rotates it 90 degrees to the right | GCP|
 | [create-note](https://github.com/playbook-labs/pb-plugins/tree/main/create-note) | A plugin that takes an asset and extracts the text to a note asset | GCP|
+| [open-in-tab](https://github.com/playbook-labs/pb-plugins/tree/main/open-in-tab) | A plugin that opens a file in a new tab. | GCP|
+| [split2x2](https://github.com/playbook-labs/pb-plugins/tree/main/split2x2) | A plugin that splits a 2x2 gallery-style image into 4 separate images. | GCP|
 

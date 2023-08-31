@@ -42,7 +42,6 @@ async function createAsset(callbackUrl, pluginInvocationToken, title) {
     operation: "createAssets",
     assets: [
       {
-        group: null,
         title: title,
         mediaType: "image/gif"
       },

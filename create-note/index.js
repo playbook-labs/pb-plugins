@@ -36,7 +36,6 @@ functions.cloudEvent("extractTextPubSub", async (cloudEvent) => {
         assets: [
           {
             title: title + " - text",
-            group: asset.token,
             type: "note",
             value: data.text,
           },

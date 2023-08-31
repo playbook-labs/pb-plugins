@@ -3,7 +3,6 @@ import axios from "axios"
 export default async ( {pluginInvocationToken, assets, callbackUrl }) => {
 
   console.log("Invoking removeBg plugin", pluginInvocationToken)
-  
 
   let status = "success"
 
@@ -34,7 +33,7 @@ export default async ( {pluginInvocationToken, assets, callbackUrl }) => {
         assets: [
           {
             title: `${title} - no background`,
-            group: token,
+            mediaType: "image/png",
           },
         ],
       },

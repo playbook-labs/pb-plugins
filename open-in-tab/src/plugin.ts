@@ -2,14 +2,12 @@ import {
   PlaybookAPI,
 } from "./lib";
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
 export default async function ({
   pluginInvocationToken,
   callbackUrl,
   assets,
 }: PluginInvocationParams) {
-  console.log("invoked plugin");
+  console.log("Invoked plugin", callbackUrl);
 
   const playbookAPI = new PlaybookAPI({
     pluginInvocationToken,
@@ -18,13 +16,8 @@ export default async function ({
 
   const inputAsset = assets[0];
 
-  console.log("sleeping on", inputAsset.token)
+  await playbookAPI.openUrl(inputAsset.url)
+  await playbookAPI.reportStatus("success");
 
-  await sleep(10_000)
-
-  console.log("awake");
-
-  playbookAPI.reportStatus("success");
-
-  console.log("done");
+  console.log("Done");
 }

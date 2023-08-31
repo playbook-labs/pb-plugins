@@ -20,12 +20,12 @@ type InputAssetType = {
   type: string;
 };
 
-type CreateSkeletonAssetType = {
+type CreatePlaceholderAssetType = {
   title: string;
   group?: AssetToken;
 };
 
-type SkeletonAssetType = {
+type PlaceholderAssetType = {
   token: AssetToken;
   title: string;
   uploadUrl: UrlString;

@@ -34,12 +34,12 @@ export class PlaybookAPI {
     this.pluginInvocationToken = pluginInvocationToken;
   }
 
-  // Create skeleton assets (assets with no data, only titles).
+  // Create placeholder assets (assets with no data, only titles).
   // After the assets are created, fill in their file data by
   // uploading to the `uploadUrl` in the response.
-  async createSkeletonAssets(
-    assets: CreateSkeletonAssetType[]
-  ): Promise<SkeletonAssetType[]> {
+  async createPlaceholderAssets(
+    assets: CreatePlaceholderAssetType[]
+  ): Promise<PlaceholderAssetType[]> {
     const response = await axios({
       method: "post",
       url: this.callbackUrl,
@@ -52,9 +52,22 @@ export class PlaybookAPI {
     return response.data.assets;
   }
 
+  // Open a new tab in the user's browser, as long as their
+  // window is still open
+  async openUrl(url: string) {
+    await axios({
+      method: "post",
+      url: this.callbackUrl,
+      data: {
+        pluginInvocationToken: this.pluginInvocationToken,
+        openUrl: url,
+      },
+    });
+  }
+
   // Always call this at the end of your plugin's run to mark
   // the invocation as complete
-  async reportStatus(status: "success" | "failure") {
+  async reportStatus(status: "success" | "failed") {
     await axios({
       method: "post",
       url: this.callbackUrl,

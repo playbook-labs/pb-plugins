@@ -1,6 +1,7 @@
 import { createGif } from "./createGif.js";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
+import sharp from 'sharp';
 
 // Handler
 export const handler =  async function (event, context) {
@@ -9,24 +10,41 @@ export const handler =  async function (event, context) {
   const callbackUrl = event.callbackUrl;
   try {
 
-  const callbackResponse = await createAsset(
-    callbackUrl,
-    pluginInvocationToken,
-    uuidv4() + ".gif"
-  );
-  console.log('created skeleton asset');
+    const inputAsset = event.assets[0]
 
-  const uploadUrl = callbackResponse.data.assets[0].uploadUrl;
 
-  const assetUrls = event.assets.map((asset) => asset.url);
-  const gifBuffer = await createGif(assetUrls);
-  console.log('created gif');
+    const inputImageBuffer = (
+      await axios({
+        url: inputAsset.url,
+        responseType: 'arraybuffer'
+      })
+    ).data;
+    const outputImageBuffer = await sharp(inputImageBuffer).rotate(90).toBuffer();
+    const image = await sharp(outputImageBuffer);
+    const metadata = await image.metadata();
 
-  await uploadImage(uploadUrl, gifBuffer);
-  console.log('uploaded gif');
+    const res = await generateAssetThumbnailUrl(callbackUrl, pluginInvocationToken, 'vXtFT6m7fNbUJuhgxNwiKJij', metadata.width, metadata.height)
 
-  await reportStatus(callbackUrl, pluginInvocationToken, "success");
-  console.log('reported success');
+    await uploadImage(res.data['thumbnailUploadUrl'], outputImageBuffer)
+
+  // const callbackResponse = await createAsset(
+  //   callbackUrl,
+  //   pluginInvocationToken,
+  //   uuidv4() + ".gif"
+  // );
+  // console.log('created skeleton asset');
+
+  // const uploadUrl = callbackResponse.data.assets[0].uploadUrl;
+
+  // const assetUrls = event.assets.map((asset) => asset.url);
+  // const gifBuffer = await createGif(assetUrls);
+  // console.log('created gif');
+
+  // await uploadImage(uploadUrl, gifBuffer);
+  // console.log('uploaded gif');
+
+  // await reportStatus(callbackUrl, pluginInvocationToken, "success");
+  // console.log('reported success');
 
   return;
   } catch (error) {
@@ -34,6 +52,20 @@ export const handler =  async function (event, context) {
     await reportStatus(callbackUrl, pluginInvocationToken, "failed");
     console.log('reported failure');
   }
+}
+
+async function generateAssetThumbnailUrl(callbackUrl, pluginInvocationToken, assetToken, width, height) {
+  return await axios({
+    method: "post",
+    url: callbackUrl,
+    data: {
+      pluginInvocationToken,
+      assetTokenToGenerateThumbnailFor: assetToken,
+      thumbnailWidth: width,
+      thumbnailHeight: height
+    },
+
+  })
 }
 
 async function createAsset(callbackUrl, pluginInvocationToken, title) {
@@ -53,7 +85,7 @@ async function createAsset(callbackUrl, pluginInvocationToken, title) {
 async function uploadImage(uploadUrl, imageBuffer) {
   return await axios({
     method: "put",
-    headers: { "Content-Type": "image/gif" },
+    headers: { "Content-Type": "image/png" },
     url: uploadUrl,
     data: imageBuffer,
   });

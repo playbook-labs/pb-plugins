@@ -23,7 +23,7 @@ export default async function ({
 
   const response = await playbookAPI.generateAssetPreviewUrl(inputAsset.token, 1201, 1201);
 
-  await uploadBufferToUrl(inputBuffer, response.data.previewUploadUrl)
+  await uploadBufferToUrl(inputBuffer, response.data.newPreviews[0].previewUploadUrl)
   await playbookAPI.reportStatus("success");
 
   console.log("Done");

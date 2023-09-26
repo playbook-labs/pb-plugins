@@ -70,10 +70,12 @@ export class PlaybookAPI {
       method: "post",
       url: this.callbackUrl,
       data: {
+        newPreviews: [{
+          token: assetToken,
+          previewWidth: width,
+          previewHeight: height
+        }],
         pluginInvocationToken: this.pluginInvocationToken,
-        assetTokenToGeneratePreviewFor: assetToken,
-        previewWidth: width,
-        previewHeight: height
       },
   
     })

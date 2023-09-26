@@ -1,6 +1,6 @@
 # Generate Preview (Playbook Plugin)
 
-An example plugin that generates a preview for an asset that does not have an existing preview.
+An example plugin that generates a preview for an asset. The asset cannot be an image, color, or note.
 
 ## Development
 
@@ -35,26 +35,26 @@ gcloud projects create EXAMPLE_PLUGIN_PROJECT
 gcloud config set project EXAMPLE_PLUGIN_PROJECT
 
 # Create PubSub Topic
-gcloud pubsub topics create OPEN_IN_TAB_TOPIC
+gcloud pubsub topics create GENERATE_PREVIEW_TOPIC
 
 # Deploy Invocation Handler
-gcloud functions deploy open-in-tab-invocation-handler \
+gcloud functions deploy generate-preview-invocation-handler \
   --gen2 \
   --runtime=nodejs20 \
   --region=us-west1 \
   --source=. \
-  --entry-point=openInTabInvocationHandler \
+  --entry-point=generatePreviewInvocationHandler \
   --trigger-http \
   --allow-unauthenticated \
   --timeout=540
 
 # Deploy Async Processing Function
-gcloud functions deploy open-in-tab-process-async \
-  --trigger-topic=OPEN_IN_TAB_TOPIC \
+gcloud functions deploy generate-preview-process-async \
+  --trigger-topic=GENERATE_PREVIEW_TOPIC \
   --gen2 \
   --runtime=nodejs20 \
   --region=us-west1 \
   --source=. \
-  --entry-point=openInTabProcessAsync \
+  --entry-point=generatePreviewProcessAsync \
   --timeout=540
 ```

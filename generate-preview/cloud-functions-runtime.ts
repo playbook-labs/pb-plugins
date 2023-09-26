@@ -11,11 +11,11 @@ import plugin from './src/plugin';
 
 // This is the function that will be called by Playbook when the plugin is invoked.
 // All it does is enqueue a separate job to process the assets and returns 200 OK
-functions.http('openInTabInvocationHandler', async (req, res) => {
+functions.http('generatePreviewInvocationHandler', async (req, res) => {
   // We use pubsub to enqueue a job to process the assets
   const dataBuffer = Buffer.from(JSON.stringify(req.body));
   await new PubSub()
-    .topic('OPEN_IN_TAB_TOPIC')
+    .topic('GENERATE_PREVIEW_TOPIC')
     .publishMessage({ data: dataBuffer });
 
   // Return quickly so we don't run into an HTTP timeout
@@ -23,7 +23,7 @@ functions.http('openInTabInvocationHandler', async (req, res) => {
 });
 
 // This function does the actual work of the plugin asynchronously
-functions.cloudEvent('openInTabProcessAsync', async (cloudEvent: any) => {
+functions.cloudEvent('generatePreviewProcessAsync', async (cloudEvent: any) => {
   const body = JSON.parse(Buffer.from(cloudEvent.data.message.data, 'base64').toString());
 
   console.log('data', cloudEvent.data.message.data);

@@ -16,7 +16,6 @@ export default async function ({ pluginInvocationToken, assets, callbackUrl }) {
       assets: [
         {
           title: `${inputAsset.title} - rotated`,
-          group: inputAsset.token
         }
       ]
     }
